@@ -31,6 +31,9 @@ class DesktopOnDownloadCompletionActionProvider(
             add(
                 CleanExtraSettingsOnDownloadFinish(extraDownloadSettingsStorage)
             )
+            add(
+                RemoveMp4DownloadRecordOnDownloadFinish()
+            )
         }
     }
 }
