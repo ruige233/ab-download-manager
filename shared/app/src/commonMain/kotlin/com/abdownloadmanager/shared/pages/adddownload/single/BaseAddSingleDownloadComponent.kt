@@ -241,6 +241,29 @@ abstract class BaseAddSingleDownloadComponent(
     private val canAdd = downloadChecker.canAdd
     private val isDuplicate = downloadChecker.isDuplicate
 
+    // Auto-select the "Add a numbered file" solution when the download's file name
+    // collides with an already existing download, so the user can press Download
+    // right away without opening "Show solutions" and picking the option manually.
+    // A user-selected strategy (e.g. "Override existing file") is never overwritten.
+    init {
+        combine(
+            isDuplicate,
+            onDuplicateStrategy,
+        ) { isDuplicate, selectedStrategy ->
+            if (isDuplicate && selectedStrategy == null) {
+                OnDuplicateStrategy.AddNumbered
+            } else {
+                null
+            }
+        }
+            .onEach { defaultStrategy ->
+                if (defaultStrategy != null) {
+                    onDuplicateStrategy.update { defaultStrategy }
+                }
+            }
+            .launchIn(scope)
+    }
+
     val isLinkLoading = downloadChecker.gettingResponseInfo
     val checkResponseResult = downloadChecker.responseResult
     val lastError = downloadChecker.lastErrorReason
